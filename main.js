@@ -24,7 +24,7 @@ function fetchParticipantsFluctuation() {
   var participants = fetchParticipants();
   cache.put('participants_one_mitites_ago', participants, 10);
   
-  if(!partricipants_one_minutes_ago) {
+  if(partricipants_one_minutes_ago == null) {
     return 0;
   }
   return participants - partricipants_one_minutes_ago
