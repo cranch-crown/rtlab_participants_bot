@@ -3,9 +3,9 @@ function fetchParticipants() {
   //イベント毎にスクリプトプロパティにIDを設定する！！
   const EVENT_ID = PropertiesService.getScriptProperties().getProperty("EVENT_ID");
 
-  const CONNPASS_API_ENDPOINT = "https://connpass.com/api/v1/event/";
+  const ENDPOINT = PropertiesService.getScriptProperties().getProperty("CONNPASS_ENDPOINT");
 
-  var url = CONNPASS_API_ENDPOINT + '?event_id=' + EVENT_ID;
+  var url = ENDPOINT + '?event_id=' + EVENT_ID;
   var options = {
     'method': 'GET'
   };
@@ -22,14 +22,71 @@ function fetchParticipantsFluctuation() {
 
   //今回取得した参加者でキャッシュを上書き
   var participants = fetchParticipants();
-  cache.put('participants_one_mitites_ago', participants, 10);
+  cache.put('participants_one_mitites_ago', participants, 90);
   
   if(partricipants_one_minutes_ago == null) {
-    return 0;
+    return null;
   }
-  return participants - partricipants_one_minutes_ago
+  return participants - partricipants_one_minutes_ago;
 }
 
-function main() {
-  fetchParticipants()
+var message = [
+  {
+    apply: function(fluctuation) {
+      return fluctuation == null;
+    },
+    message: 'お仕事を始めます！(｀･ω･´)ゞ',
+    send: true
+  },
+  {
+    apply: function(fluctuation) {
+      return fluctuation > 0;
+    },
+    message: '参加者が増えました！(*´∀｀*)',
+    send: true
+  },
+  {
+    apply: function(fluctuation) {
+      return fluctuation == 0;
+    },
+    message: null,
+    send: false
+  },
+  {
+    apply: function(fluctuation) {
+      return fluctuation < 0;
+    },
+    message: 'キャンセルした人がいます！ﾟ(ﾟ´ω`ﾟ)ﾟ｡',
+    send: true
+  }
+];
+
+function sendMessage(post_message) {
+  if(!post_message.send) {
+    return 0;
+  }
+
+  const ENDPOINT = PropertiesService.getScriptProperties().getProperty("TYPETALK_ENDPOINT");
+  const TOKEN = PropertiesService.getScriptProperties().getProperty("TYPETALK_TOKEN");
+
+  var data = {
+    'message': post_message.message
+  };
+  var headers = {
+    'X-TYPETALK-TOKEN': TOKEN
+  }
+  var options = {
+    'method': 'post',
+    'payload': data,
+    'headers': headers
+  }
+  var response = UrlFetchApp.fetch(ENDPOINT, options);
+}
+
+function watchParticipants() {
+  var fluctuation = fetchParticipantsFluctuation();
+  var match = message.find(function(rule) {
+    return rule.apply(fluctuation);
+  });
+  sendMessage(match);
 }
