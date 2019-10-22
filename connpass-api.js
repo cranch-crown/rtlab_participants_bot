@@ -14,3 +14,26 @@ function fetchParticipants() {
         response = JSON.parse(api.getContentText());
     return response.events[0].accepted;
 }
+
+function sendMessage(post_message) {
+
+    if (!post_message) {
+      return 0;
+    }
+  
+    const ENDPOINT = PropertiesService.getScriptProperties().getProperty("TYPETALK_ENDPOINT");
+    const TOKEN = PropertiesService.getScriptProperties().getProperty("TYPETALK_TOKEN");
+  
+    var data = {
+      'message': post_message
+    };
+    var headers = {
+      'X-TYPETALK-TOKEN': TOKEN
+    }
+    var options = {
+      'method': 'post',
+      'payload': data,
+      'headers': headers
+    }
+    var response = UrlFetchApp.fetch(ENDPOINT, options);
+}

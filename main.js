@@ -22,7 +22,6 @@ function fetchParticipantsFluctuation() {
   };
 }
 
-
 var messages = [
   {
     apply: function (fluctuation) {
@@ -64,30 +63,6 @@ function fetchPostMessage(participants) {
       return messages[i].message(participants.current);
     }
   }
-}
-
-function sendMessage(post_message) {
-
-  if (!post_message) {
-    return 0;
-  }
-
-  const ENDPOINT = PropertiesService.getScriptProperties().getProperty("TYPETALK_ENDPOINT");
-  const TOKEN = PropertiesService.getScriptProperties().getProperty("TYPETALK_TOKEN");
-
-  var data = {
-    'message': post_message
-  };
-  var headers = {
-    'X-TYPETALK-TOKEN': TOKEN
-  }
-  var options = {
-    'method': 'post',
-    'payload': data,
-    'headers': headers
-  }
-  var response = UrlFetchApp.fetch(ENDPOINT, options);
-  Logger.log(response);
 }
 
 function main() {
