@@ -11,7 +11,7 @@ function fetchParticipants() {
   };
   
   var api = UrlFetchApp.fetch(url,options),
-      response = JSON.parse(api.getContentText());
+    response = JSON.parse(api.getContentText());
   return response.events[0].accepted;
 }
 
@@ -21,13 +21,16 @@ function fetchParticipantsFluctuation() {
   var partricipants_one_minutes_ago = cache.get('participants_one_mitites_ago');
 
   //今回取得した参加者でキャッシュを上書き
-  var participants = fetchParticipants();
-  cache.put('participants_one_mitites_ago', participants, 90);
+  var current = fetchParticipants();
+  cache.put('participants_one_mitites_ago', current, 90);
   
   if(partricipants_one_minutes_ago == null) {
     return null;
   }
-  return participants - partricipants_one_minutes_ago;
+  return {
+    fluctuation : current - partricipants_one_minutes_ago,
+    current : current
+  };
 }
 
 var messages = [
@@ -35,34 +38,40 @@ var messages = [
     apply: function(fluctuation) {
       return fluctuation == null;
     },
-    message: 'お仕事を始めます！(｀･ω･´)ゞ',
-    send: true
+    message: function(current) {
+      return Utilities.formatString('お仕事を始めます！(｀･ω･´)ゞ\n現在の参加者登録人数は%.f人です！一緒に参加者を増やしましょう！', current);
+    }
   },
   {
     apply: function(fluctuation) {
       return fluctuation > 0;
     },
-    message: '参加者が増えました！(*´∀｀*)',
-    send: true
+    message: function(current) {
+      return Utilities.formatString('参加者が増えました！(*´∀｀*)\n只今の参加登録人数が%.f人になりました！', current);
+    }
   },
   {
     apply: function(fluctuation) {
       return fluctuation == 0;
     },
-    message: null,
+    message: function(current) {
+      return null
+    }
   },
   {
     apply: function(fluctuation) {
       return fluctuation < 0;
     },
-    message: 'キャンセルした人がいます！ﾟ(ﾟ´ω`ﾟ)ﾟ｡',
+    message: function(current) {
+      return Utilities.formatString('キャンセルした人がいます！ﾟ(ﾟ´ω`ﾟ)ﾟ｡\n参加登録人数が%.f人になってしまいました。。。', current);
+    }
   }
 ];
 
-function fetchPostMessage(fluctuation){
+function fetchPostMessage(participants){
   messages.forEach(function(i) {
-    if(i.apply(fluctuation)) {
-      return i.message;
+    if(i.apply(participants.fluctuation)) {
+      return i.message(participants.current);
     }
   });
 }
@@ -91,8 +100,8 @@ function sendMessage(post_message) {
   Logger.log(response);
 }
 
-function watchParticipants() {
-  var fluctuation = fetchParticipantsFluctuation();
-  var post_message = fetchPostMessage(fluctuation);
+function main() {
+  var participants = fetchParticipantsFluctuation();
+  var post_message = fetchPostMessage(participants);
   sendMessage(post_message);
 }
