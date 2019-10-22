@@ -1,11 +1,11 @@
 function fetchParticipantsFluctuation() {
   //1分前の参加者数をキャッシュから取得
   var cache = CacheService.getScriptCache();
-  var partricipants_one_minutes_ago = cache.get('participants_one_mitites_ago');
+  var partricipants_one_minutes_ago = cache.get('participants');
 
   //今回取得した参加者でキャッシュを上書き
   var current = fetchParticipants();
-  cache.put('participants_one_mitites_ago', current, 90);
+  cache.put('participants', current, 90);
 
   Logger.log(current);
 
@@ -65,8 +65,16 @@ function fetchPostMessage(participants) {
   }
 }
 
+//1分ごとに参加者の変動を確認するメソッド、
 function main() {
   var participants = fetchParticipantsFluctuation();
   var post_message = fetchPostMessage(participants);
+  sendMessage(post_message);
+}
+
+//週次報告
+function weeklyReport() {
+  var current = cache.get('participants');
+  var post_message = Utilities.formatString('【週次報告】\n参加人数 %i人 です！', current);
   sendMessage(post_message);
 }
