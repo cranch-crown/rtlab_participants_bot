@@ -59,7 +59,16 @@ var messages = [
   }
 ];
 
+function fetchPostMessage(fluctuation){
+  messages.forEach(function(i) {
+    if(i.apply(fluctuation)) {
+      return i.message;
+    }
+  });
+}
+
 function sendMessage(post_message) {
+
   if(!post_message) {
     return 0;
   }
@@ -84,14 +93,6 @@ function sendMessage(post_message) {
 
 function watchParticipants() {
   var fluctuation = fetchParticipantsFluctuation();
-  // var match = messages.find(function(rule) {
-  //   return rule.apply(fluctuation);
-  // });
-
-  messages.forEach(function(i) {
-    if(i.apply(fluctuation)) {
-      sendMessage(i.message);
-      return 0;
-    }
-  });
+  var post_message = fetchPostMessage(fluctuation);
+  sendMessage(post_message);
 }
