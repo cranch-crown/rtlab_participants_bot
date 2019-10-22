@@ -12,6 +12,7 @@ function fetchParticipants() {
   
   var api = UrlFetchApp.fetch(url,options),
     response = JSON.parse(api.getContentText());
+    Logger.log(response);
   return response.events[0].accepted;
 }
 
@@ -23,13 +24,19 @@ function fetchParticipantsFluctuation() {
   //今回取得した参加者でキャッシュを上書き
   var current = fetchParticipants();
   cache.put('participants_one_mitites_ago', current, 90);
+
+  Logger.log(current);
   
   if(partricipants_one_minutes_ago == null) {
-    return null;
+    return {
+      fluctuation : null,
+      'current' : current
+    };
   }
+
   return {
     fluctuation : current - partricipants_one_minutes_ago,
-    current : current
+    'current' : current
   };
 }
 
