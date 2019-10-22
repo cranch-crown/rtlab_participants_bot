@@ -74,7 +74,8 @@ function main() {
 
 //週次報告
 function weeklyReport() {
+  var cache = CacheService.getScriptCache();
   var current = cache.get('participants');
-  var post_message = Utilities.formatString('【週次報告】\n参加人数 %i人 です！', current);
+  var post_message = Utilities.formatString('【週次報告】\n\n参加人数 %i人 です！', current);
   sendMessage(post_message);
 }
