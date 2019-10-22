@@ -12,13 +12,13 @@ function fetchParticipantsFluctuation() {
   if (partricipants_one_minutes_ago == null) {
     return {
       fluctuation: null,
-      'current': current
+      current: current
     };
   }
 
   return {
     fluctuation: current - partricipants_one_minutes_ago,
-    'current': current
+    current: current
   };
 }
 
@@ -29,7 +29,7 @@ var messages = [
       return fluctuation == null;
     },
     message: function (current) {
-      return Utilities.formatString('お仕事を始めます！(｀･ω･´)ゞ\n現在の参加者登録人数は%.f人です！一緒に参加者を増やしましょう！', current);
+      return Utilities.formatString('お仕事を始めます！(｀･ω･´)ゞ\n現在の参加者登録人数は%i人です！一緒に参加者を増やしましょう！', current);
     }
   },
   {
@@ -37,7 +37,7 @@ var messages = [
       return fluctuation > 0;
     },
     message: function (current) {
-      return Utilities.formatString('参加者が増えました！(*´∀｀*)\n只今の参加登録人数が%.f人になりました！', current);
+      return Utilities.formatString('参加者が増えました！(*´∀｀*)\n只今の参加登録人数が%i人になりました！', current);
     }
   },
   {
@@ -53,17 +53,17 @@ var messages = [
       return fluctuation < 0;
     },
     message: function (current) {
-      return Utilities.formatString('キャンセルした人がいます！ﾟ(ﾟ´ω`ﾟ)ﾟ｡\n参加登録人数が%.f人になってしまいました。。。', current);
+      return Utilities.formatString('キャンセルした人がいます！ﾟ(ﾟ´ω`ﾟ)ﾟ｡\n参加登録人数が%i人になってしまいました。。。', current);
     }
   }
 ];
 
 function fetchPostMessage(participants) {
-  messages.forEach(function (i) {
-    if (i.apply(participants.fluctuation)) {
-      return i.message(participants.current);
+  for(var i=0; i < 4; i++) {
+    if(messages[i].apply(participants.fluctuation)){
+      return messages[i].message(participants.current);
     }
-  });
+  }
 }
 
 function sendMessage(post_message) {
