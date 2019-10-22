@@ -30,7 +30,7 @@ function fetchParticipantsFluctuation() {
   return participants - partricipants_one_minutes_ago;
 }
 
-var message = [
+var messages = [
   {
     apply: function(fluctuation) {
       return fluctuation == null;
@@ -50,19 +50,17 @@ var message = [
       return fluctuation == 0;
     },
     message: null,
-    send: false
   },
   {
     apply: function(fluctuation) {
       return fluctuation < 0;
     },
     message: 'キャンセルした人がいます！ﾟ(ﾟ´ω`ﾟ)ﾟ｡',
-    send: true
   }
 ];
 
 function sendMessage(post_message) {
-  if(!post_message.send) {
+  if(!post_message) {
     return 0;
   }
 
@@ -70,7 +68,7 @@ function sendMessage(post_message) {
   const TOKEN = PropertiesService.getScriptProperties().getProperty("TYPETALK_TOKEN");
 
   var data = {
-    'message': post_message.message
+    'message': post_message
   };
   var headers = {
     'X-TYPETALK-TOKEN': TOKEN
@@ -81,12 +79,19 @@ function sendMessage(post_message) {
     'headers': headers
   }
   var response = UrlFetchApp.fetch(ENDPOINT, options);
+  Logger.log(response);
 }
 
 function watchParticipants() {
   var fluctuation = fetchParticipantsFluctuation();
-  var match = message.find(function(rule) {
-    return rule.apply(fluctuation);
+  // var match = messages.find(function(rule) {
+  //   return rule.apply(fluctuation);
+  // });
+
+  messages.forEach(function(i) {
+    if(i.apply(fluctuation)) {
+      sendMessage(i.message);
+      return 0;
+    }
   });
-  sendMessage(match);
 }
