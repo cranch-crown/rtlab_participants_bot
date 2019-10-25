@@ -5,7 +5,7 @@ function fetchParticipantsFluctuation() {
 
   //今回取得した参加者でキャッシュを上書き
   var current = fetchParticipants();
-  cache.put('participants', current, 90);
+  cache.put('participants', current, 600);
 
   Logger.log(current);
 
