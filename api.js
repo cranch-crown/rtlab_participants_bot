@@ -15,11 +15,11 @@ function fetchParticipants() {
     return response.events[0].accepted;
 }
 
+//引数：Typetalkに表示させるメッセージ
+//戻り値：使わない
 function sendMessage(post_message) {
 
-    if (!post_message) {
-      return 0;
-    }
+    if (!post_message) return;
   
     const ENDPOINT = PropertiesService.getScriptProperties().getProperty("TYPETALK_ENDPOINT");
     const TOKEN = PropertiesService.getScriptProperties().getProperty("TYPETALK_TOKEN");

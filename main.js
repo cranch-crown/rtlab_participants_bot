@@ -57,6 +57,10 @@ var messages = [
   }
 ];
 
+var ConnPass = function(){
+  
+};
+
 function fetchPostMessage(participants) {
   for(var i=0; i < 4; i++) {
     if(messages[i].apply(participants.fluctuation)){
