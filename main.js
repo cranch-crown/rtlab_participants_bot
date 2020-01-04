@@ -1,27 +1,3 @@
-function fetchParticipantsFluctuation() {
-  //1分前の参加者数をキャッシュから取得
-  var cache = CacheService.getScriptCache();
-  var partricipants_one_minutes_ago = cache.get('participants');
-
-  //今回取得した参加者でキャッシュを上書き
-  var current = fetchParticipants();
-  cache.put('participants', current, 600);
-
-  Logger.log(current);
-
-  if (partricipants_one_minutes_ago == null) {
-    return {
-      fluctuation: null,
-      current: current
-    };
-  }
-
-  return {
-    fluctuation: current - partricipants_one_minutes_ago,
-    current: current
-  };
-}
-
 var messages = [
   {
     apply: function (fluctuation) {
@@ -57,10 +33,6 @@ var messages = [
   }
 ];
 
-var ConnPass = function(){
-  
-};
-
 function fetchPostMessage(participants) {
   for(var i=0; i < 4; i++) {
     if(messages[i].apply(participants.fluctuation)){
@@ -71,7 +43,8 @@ function fetchPostMessage(participants) {
 
 //1分ごとに参加者の変動を確認するメソッド、
 function main() {
-  var participants = fetchParticipantsFluctuation();
+  var api = new ConnPass();
+  var participants = api.fetchParticipants();
   var post_message = fetchPostMessage(participants);
   sendMessage(post_message);
 }
